@@ -1,0 +1,12 @@
+{
+  "name": "blockchain-demo",
+  "version": "1.0.0",
+  "description": "Blockchain demo",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=4.3.2"
+  }
+}
