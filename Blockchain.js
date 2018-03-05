@@ -30,9 +30,10 @@ class Blockchain {
 
     for (let i = 0; i < this.blockchain.length; i++) {
       const currentBlock = this.blockchain[i];
-      const validBlock = (currentBlock.index !== i) && currentBlock.isValid(previousBlock);
+      const validBlock = (currentBlock.index === i) && currentBlock.isValid(previousBlock) && (currentBlock.calculateHash() === currentBlock.hash);
 
       if (!validBlock) {
+        isValid = false;
         break;
       }
       previousBlock = currentBlock;
