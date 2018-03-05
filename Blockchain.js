@@ -16,12 +16,7 @@ class Blockchain {
 
   addData(blockData) {
     const latestBlock = this.getLatestBlock();
-
-    if (typeof blockData === 'object') {
-      const data = JSON.stringify(blockData);
-    }
-
-    const newBlock = new Block(latestBlock.index + 1, latestBlock.hash, (new Date()).valueOf(), data || blockData);
+    const newBlock = new Block(latestBlock.index + 1, latestBlock.hash, (new Date()).valueOf(), blockData);
 
     if (newBlock.isValid(latestBlock)) {
       this.blockchain.push(newBlock);
@@ -31,32 +26,46 @@ class Blockchain {
   }
 
   isValid() {
-    // if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(genesisBlock())) {
-    //     return false;
-    // }
-    // let tempBlocks = [blockchainToValidate[0]];
-    // for (let i = 1; i < blockchainToValidate.length; i++) {
-    //     if (isValidNewBlock(blockchainToValidate[i], tempBlocks[i - 1])) {
-    //         tempBlocks.push(blockchainToValidate[i]);
-    //     } else {
-    //         return false;
-    //     }
-    // }
-    // return true;
+    let previousBlock, isValid = true;
+
+    for (let i = 0; i < this.blockchain.length; i++) {
+      const currentBlock = this.blockchain[i];
+      const validBlock = (currentBlock.index === i) && currentBlock.isValid(previousBlock) && (currentBlock.calculateHash() === currentBlock.hash);
+
+      if (!validBlock) {
+        isValid = false;
+        break;
+      }
+      previousBlock = currentBlock;
+    }
+
+    return isValid;
   }
 
   conciliate(otherBlockchain) {
-    // if (isValidChain(newBlocks) && newBlocks.length > blockchain.length) {
-    //   console.log('Received blockchain is valid. Replacing current blockchain with received blockchain');
-    //   blockchain = newBlocks;
-    //   broadcast(responseLatestMsg());
-    // } else {
-    //   console.log('Received blockchain invalid');
-    // }
+    if (this.isValid()) {
+      if (otherBlockchain.isValid()) {
+
+        if (otherBlockchain.blockchain.length > this.blockchain.length) {
+          this.blockchain = otherBlockchain.blockchain;
+        }
+
+      }
+    } else {
+      if (otherBlockchain.isValid()) {
+        this.blockchain = otherBlockchain.blockchain;
+      }
+    }
   }
 
-  show() {
+  show(logger) {
+    if (!logger) {
+      logger = console.log;
+    }
 
+    for (let i = 0; i < this.blockchain.length; i++) {
+      logger(`${this.blockchain[i]}`);
+    }
   }
 }
 
